@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "inventario-ativos-ti"
+version = "0.1.0"
+description = "Inventário de ativos de TI: agente Windows coleta HW/SW, servidor SQLite e dashboard simples. / IT asset inventory: Windows agent collects HW/SW, SQLite server and simple dashboard."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Kelvin Oliveira"}]
+keywords = ["inventory", "it-assets", "windows", "sqlite", "dashboard"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+]
+
+[project.scripts]
+inventario-ti = "inventario_ativos_ti.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
