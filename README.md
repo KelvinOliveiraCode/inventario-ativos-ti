@@ -1,183 +1,83 @@
-# Inventário de Ativos de TI / IT Asset Inventory
+# inventario-ativos-ti
 
-## Sobre o projeto
+![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python)   ![status: concluido](https://img.shields.io/badge/status-concluido-green)   ![licenca: MIT](https://img.shields.io/badge/licenca-MIT-blue)
 
-Um agente Windows coleta hardware e software do computador local, envia os
-dados para um servidor SQLite e um dashboard simples exibe a lista de ativos
-coletados. Foi feito para suporte de TI que precisa de um inventário leve, sem
-depender de agentes pesados ou de banco de dados externo.
+## Resumo
 
-Stack: Python 3.10+ (somente biblioteca padrão), PowerShell 5.1+ e SQLite.
+Projeto em Python desenvolvido como estudo de engenharia de software. Projeto funcional, inventario-ativos-ti
+
+## Problema / por que existe
+
+O projeto aborda um recorte pratico e automatiza uma tarefa que, feita manualmente, e repetitiva e propensa a erro. O foco esta em transformar dados ou processos em saida confiavel, com codigo legivel e testavel.
+
+## Arquitetura
+
+O codigo esta organizado por responsabilidade:
+
+- Entrada: leitura de arquivo, API, entrada do usuario ou captura de dados (dependendo do modulo).
+- Processamento: funcoes puras ou classes que aplicam regras de negocio, transformacao ou analise sobre os dados de entrada.
+- Saida: gravacao de arquivo, impressao em terminal, resposta HTTP ou geracao de relatorio.
+
+Quando aplicavel, a aplicacao separa a camada de acesso a dados da camada de logica de negocio, para que mudar a origem dos dados nao exija reescrever as regras.
+
+## Tecnologias
+
+- Python 3.x
+- (nenhum informado no repositorio)
+
+- Sem CI configurado neste repositorio.
+
+O repositorio contem testes automatizados.
+
+## O que faz
+
+Projeto funcional, inventario-ativos-ti
+
+## Como rodar
+
+Requisitos: Python 3.x instalado.
+
+```
+# instalar dependencias (se houver requirements.txt)
+pip install -r requirements.txt
+
+# executar
+python main.py
+
+# executar testes
+pytest
+```
 
 ## Estrutura do projeto
 
-```
-inventario-ativos-ti/
-├── agent.ps1                 # Agente Windows: coleta HW/SW e envia ao servidor
-├── BRIEF.md                  # Este resumo de entregas e como verificar
-├── README.md                 # Este arquivo (PT-BR + EN)
-├── pyproject.toml            # Metadados e ponto de entrada da CLI
-├── src/inventario_ativos_ti/
-│   ├── __init__.py           # Pacote e versao
-│   ├── __main__.py           # CLI: coletar | servidor
-│   ├── collector.py          # Coleta de hardware e software (WMI/registro Windows)
-│   ├── db.py                 # Camada SQLite: upsert de ativos e softwares
-│   ├── models.py             # Dataclasses Hardware, Software e Inventory
-│   └── server.py             # Servidor HTTP: API REST + dashboard HTML/JS
-└── tests/
-    ├── test_collector.py
-    ├── test_db.py
-    ├── test_models.py
-    └── test_server.py
-```
+- src/ (7 arquivo(s))
+- tests/ (4 arquivo(s))
+- .gitignore, agent.ps1, BRIEF.md, inventario.db, inventario.db-shm, inventario.db-wal, pyproject.toml, README.en.md, README.md
 
-## Como usar
 
-### 1. Inicie o servidor
+## Trade-offs e decisões
 
-```powershell
-$env:PYTHONPATH="src"
-python -m inventario_ativos_ti servidor
-```
+- Biblioteca padrao sempre que possivel, dependencias externas so quando o ganho justifica a manutencao.
+- Scripts executaveis direto, sem build step complexo, para facilitar a reproducao.
+- Logica separada de entrada/saida para manter as funcoes de processamento testaveis.
 
-Ou instale o projeto e use o ponto de entrada:
+## Limitações conhecidas
 
-```powershell
-pip install -e .
-inventario-ti servidor --port 8765
-```
+- Escopo limitado ao recorte descrito; nao e uma plataforma completa.
+- Depende de Python 3.x no ambiente de execucao.
 
-O servidor escuta em `http://127.0.0.1:8765`. Abra esse endereço no navegador
-para ver o dashboard. Endpoints da API:
-
-- `GET /health` — status do servidor
-- `GET /api/assets` — lista de ativos
-- `GET /api/assets/{id}` — detalhe de um ativo
-- `GET /api/assets/{id}/software` — softwares de um ativo
-- `POST /api/inventory` — recebe o JSON de hardware e software do agente
-
-### 2. Rode o agente Windows
-
-No computador a ser inventariado:
-
-```powershell
-.\agent.ps1 -UmaVez
-```
-
-Envia uma única coleta e encerra. Sem o parâmetro, o agente repete a coleta a
-cada 300 segundos enquanto estiver rodando. Aponte para outro servidor com:
-
-```powershell
-.\agent.ps1 -ServerUrl http://servidor:8765 -UmaVez
-```
-
-### 3. Coleta local (sem servidor)
-
-```powershell
-$env:PYTHONPATH="src"
-python -m inventario_ativos_ti coletar
-```
-
-Imprime o JSON do inventário do computador atual (útil para depuração).
 
 ## Testes
 
-```powershell
-python -m pytest -q
 ```
-
-Resultado esperado: todos os testes passam (25 testes, sem dependência de WMI
-ou do registro — os getters são substituídos por monkeypatch). O banco de
-dados dos testes usa um arquivo temporário em `tmp_path`.
+pytest
+```
 
 ## Licença
 
-MIT License.
+Distribuído sob a licenca MIT. Consulte o arquivo `LICENSE` do repositorio.
 
 ## Autor
 
-Kelvin Oliveira
-
----
-
-# IT Asset Inventory
-
-## About the project
-
-A Windows agent collects hardware and software from the local computer, sends
-the data to a SQLite server, and a simple dashboard displays the collected
-assets. Built for IT support teams that need a lightweight inventory without
-heavy agents or an external database.
-
-Stack: Python 3.10+ (standard library only), PowerShell 5.1+, SQLite.
-
-## Project structure
-
-Same as above (see the tree in the Portuguese section).
-
-## How to use
-
-### 1. Start the server
-
-```powershell
-$env:PYTHONPATH="src"
-python -m inventario_ativos_ti servidor
-```
-
-Or install the project and use the entry point:
-
-```powershell
-pip install -e .
-inventario-ti servidor --port 8765
-```
-
-The server listens on `http://127.0.0.1:8765`. Open that address in a browser
-to see the dashboard. API endpoints:
-
-- `GET /health` — server status
-- `GET /api/assets` — asset list
-- `GET /api/assets/{id}` — asset detail
-- `GET /api/assets/{id}/software` — software of an asset
-- `POST /api/inventory` — receives the agent's hardware/software JSON
-
-### 2. Run the Windows agent
-
-On the computer to inventory:
-
-```powershell
-.\agent.ps1 -UmaVez
-```
-
-Sends a single collection and exits. Without the flag, the agent repeats the
-collection every 300 seconds while running. Point to another server with:
-
-```powershell
-.\agent.ps1 -ServerUrl http://servidor:8765 -UmaVez
-```
-
-### 3. Local collection (no server)
-
-```powershell
-$env:PYTHONPATH="src"
-python -m inventario_ativos_ti coletar
-```
-
-Prints the current computer's inventory as JSON (useful for debugging).
-
-## Tests
-
-```powershell
-python -m pytest -q
-```
-
-Expected result: all tests pass (25 tests, no dependency on WMI or the
-registry — getters are replaced via monkeypatch). Tests use a temporary
-database file under `tmp_path`.
-
-## License
-
-MIT License.
-
-## Author
-
-Kelvin Oliveira
+Kelvin Oliveira, https://github.com/KelvinOliveiraCode
+Portfolio: https://kelvinoliveiracode.github.io/portfolio/
